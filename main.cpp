@@ -6,6 +6,6 @@ int main(int argc, char **argv, char **envp) {
 
 
   Executive exec(envp);
-  // exec.run();
+  exec.Run();
   return 0;
 }

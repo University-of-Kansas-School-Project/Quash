@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include <sstream>
 
 #include "Executive.h"
@@ -8,6 +9,9 @@
 
 Executive::Executive(char **envp) {
   std::string unparsedPath = "";
+  std::string* path;
+  std::string home;
+  std::string pwd;
 
   for(int lcv=0;envp[lcv] != nullptr; lcv++) {
     // std::cout << envp[lcv] <<std::endl;
@@ -15,8 +19,11 @@ Executive::Executive(char **envp) {
       if(envVar.substr(0,5) == "PATH=") {
         unparsedPath = envVar.substr(5, envVar.size());
       }
-      if(envVar.substr(0,5) == "HOME=") {
+      else if(envVar.substr(0,5) == "HOME=") {
         home = envVar.substr(5, envVar.size());
+      }
+      else if(envVar.substr(0,4) == "PWD=") {
+        pwd = envVar.substr(4, envVar.size());
       }
   }
 
@@ -35,8 +42,26 @@ Executive::Executive(char **envp) {
       path[ind] = p;
       ind ++;
   }
+  prog = new Quash(path, home, pwd);
 }
 
-void Executive::Run() {
 
+void Executive::Run() {
+  bool b = true;
+  std::string inp = "";
+  while(b){
+  std::cout<<"quash> ";
+  //std::getline(std::cin, inp);
+  std::getline(std::cin, inp);
+
+  for(int lcv = 0; lcv < inp.size(); lcv++) {
+    inp[lcv] = std::tolower(inp[lcv]);
+  }
+
+  std::cout<<std::endl;
+  //  std::cout << inp <<std::endl;
+    if(inp == "quit" || inp == "exit") {
+      b = false;
+    }
+  }
 }

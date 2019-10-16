@@ -12,8 +12,8 @@ class Executive {
     void Run();
 
   private:
-    std::string* path;
-    std::string home;
+    Quash* prog;
+
 
 };
 
