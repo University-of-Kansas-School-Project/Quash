@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "Squash.h"
+#include "Quash.h"
 
 class Executive {
   public:

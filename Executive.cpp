@@ -2,8 +2,7 @@
 #include <string>
 
 #include "Executive.h"
-#include "Squash.h"
+#include "Quash.h"
 
 Executive::Executive() {
 }
-

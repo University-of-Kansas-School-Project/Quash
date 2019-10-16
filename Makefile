@@ -1,14 +1,14 @@
-Squash: main.o Executive.o Squash.o 
-	g++ -g -std=c++11 main.o Executive.o Squash.o -o Squash
+Quash: main.o Executive.o Quash.o
+	g++ -g -std=c++11 main.o Executive.o Quash.o -o Quash
 
 main.o: main.cpp Executive.h
 	g++ -std=c++11 -g -c main.cpp
 
-Executive.o: Executive.h Executive.cpp Squash.h 
+Executive.o: Executive.h Executive.cpp Quash.h
 	g++ -std=c++11 -g -c Executive.cpp
 
-Linkedlist.o: Squash.h Squash.cpp 
-	g++ -std=c++11 -g -c Squash.cpp
+Quash.o: Quash.h Quash.cpp 
+	g++ -std=c++11 -g -c Quash.cpp
 
 clean:
-	rm *.o Squash
+	rm *.o Quash
