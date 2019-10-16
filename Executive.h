@@ -8,9 +8,12 @@
 
 class Executive {
   public:
-    Executive();
+    Executive(char **envp);
+    void Run();
 
   private:
+    std::string* path;
+    std::string home;
 
 };
 
