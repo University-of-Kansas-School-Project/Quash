@@ -43,6 +43,8 @@ Executive::Executive(char **envp) {
       ind ++;
   }
   prog = new Quash(path, home, pwd);
+
+  prog->SetPathRaw(unparsedPath);
 }
 
 
@@ -103,6 +105,44 @@ void Executive::Run() {
         else {
           std::cout << "Error: cd has extra arguments\n";
         }
+      }
+      else if(inpArgs[0] == "set") {
+        std::cout <<"In Set, arg: " <<inpArgs[1].substr(0,5) <<std::endl;
+        if(inpArgs[1].substr(0,5) == "PATH=") {
+          std::string* path;
+          std::string unparsedPathIn = prog->GetPathRaw() + ':' + inpArgs[1].substr(6,inpArgs[1].size()-1);
+          prog->SetPathRaw(unparsedPathIn);
+          std::istringstream pathStream(unparsedPathIn);
+          std::string p;
+          int count=1;
+          for(int lcv=0; lcv < unparsedPathIn.size(); lcv++ ) {
+            if(unparsedPathIn[lcv] == ':') {
+              count++;
+            }
+          }
+          path = new std::string[count];
+          int ind = 0;
+
+          while(std::getline(pathStream, p, ':')) {
+              path[ind] = p;
+              ind ++;
+          }
+          prog->SetPath(path);
+          std::cout <<"Path set to: " <<prog->GetPathRaw() <<std::endl;
+        }
+        else if(inpArgs[1].substr(0,5) == "HOME=") {
+          prog->SetHome(inpArgs[1].substr(5,inpArgs[1].size()));
+          std::cout <<"HOME set to: " <<prog->GetHome() <<std::endl;
+        }
+        else {
+          std::cout <<"Error: Set path variable was not HOME or PATH. \n";
+        }
+      }
+      else if(inpArgs[0] == "PATH") {
+        std::cout << prog->GetPathRaw() <<std::endl;
+      }
+      else if(inpArgs[0] == "HOME") {
+        std::cout << prog->GetHome() <<std::endl;
       }
       else
         prog->Run(inpArgs, isBG, countSP);
