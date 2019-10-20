@@ -89,7 +89,7 @@ bool Quash::ReadIn(std::string path) {
 
 bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
   int p[2];
-  std::cout<<" In pipe\n";
+  //std::cout<<" In pipe\n";
   if(pipe(p)<0){
     fprintf(stderr, "Error in Fork\n");
     return false;
@@ -119,7 +119,8 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     return false;
   }
   if(p_id1 == 0){
-    std::cout<<" In left\n";
+    //std::cout<<" In left\n";
+    //std::cout<<argsl[0]<<argsl[1]<<std::endl;
     close(p[0]);
     dup2(p[1], STDOUT_FILENO);
     close(p[1]);
@@ -141,8 +142,8 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
   }
   if(p_id2 == 0){
     close(p[1]);
-    std::cout<<" In right\n";
-    std::cout<<argsR[1]<<std::endl;
+    //std::cout<<" In right\n";
+    //std::cout<<argsR[0]<<argsR[1]<<argsR[2]<<rightProgram->length()<<std::endl;
     dup2(p[0], STDIN_FILENO);
     close(p[0]);
     if(execvpe(argsR[0], argsR, envp) < 0){
@@ -154,6 +155,8 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     fprintf(stderr, "Process 1 encountered an error. ERROR%d\n", errno);
     return EXIT_FAILURE;
   }
+  close(p[0]);
+  close(p[1]);
   return true;
 }
 
