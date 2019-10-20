@@ -50,49 +50,45 @@ void Executive::Run() {
   bool b = true;
   bool isBG = false;
   std::string inp = "";
+  char * args;
   while(b){
-  std::cout<<"quash> ";
-  //std::getline(std::cin, inp);
-  std::getline(std::cin, inp);
+    std::cout<<"quash> ";
+    //std::getline(std::cin, inp);
+    inp = "";
+    std::getline(std::cin, inp);
+    int countSP=1;
+      for(int lcv = 0; lcv < inp.length(); lcv++) {
+        inp[lcv] = std::tolower(inp[lcv]);
+        if(inp[lcv] == ' ' || inp[lcv] == '\0') {
+          countSP++;
+        }
+      }
 
-  for(int lcv = 0; lcv < inp.size(); lcv++) {
-    inp[lcv] = std::tolower(inp[lcv]);
-  }
+    std::istringstream inpA;
+    inpA.str(inp);
+    std::string inpArgs[countSP+1];
+    int ind = 0;
 
-  int countSP=1;
-  for(int lcv=0; lcv < inp.size(); lcv++ ) {
-    if(inp[lcv] == ' ') {
-      countSP++;
+    for(int i =0; i<countSP; i++)
+      inpA >> inpArgs[i];
+
+      if(inp[inp.size()-1] == '&')
+        isBG = true;
+      //user defined path
+          //std::cout<<" Inp Args: "<<inpArgs[0];
+          // for(int i =0; i<countSP; i++)
+          //   std::cout<<" Args: "<<inpArgs[i]
+
+
+    //non user defined path
+
+    std::cout<<std::endl;
+    //  std::cout << inp <<std::endl;
+      if(inp == "quit" || inp == "exit") {
+        std::cout <<"Goodbye!\n";
+        exit(0);
+      }
+      else
+        prog->Run(inpArgs, isBG, countSP);
     }
-  }
-
-  std::istringstream inpA(inp);
-  std::string inpArgs[countSP];
-  int ind = 0;
-
-while(!inpA.eof()){
-  inpA >> inpArgs[ind];
-  ind ++;
-}
-
-  if(inp[inp.size()-1] == '&')
-    isBG = true;
-  //user defined path
-  if(inp[0] == '/') {
-    if(ind > 1)
-      prog->Run(inpArgs[0], isBG, inpArgs);
-    else
-      prog->Run(inpArgs[0], isBG);
-  }
-
-
-  //non user defined path
-
-  std::cout<<std::endl;
-  //  std::cout << inp <<std::endl;
-    if(inp == "quit" || inp == "exit") {
-      std::cout <<"Goodbye!\n";
-      b = false;
-    }
-  }
 }

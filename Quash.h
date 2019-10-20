@@ -12,7 +12,7 @@ class Quash {
     //Member Functions
     bool SetPath(std::string path);
     bool ChangeDir(std::string dir);
-    bool Run(std::string programPath, bool isBackgroundProcess, std::string programArgs[]={});
+    bool Run(std::string* programPath, bool isBackgroundProcess, int c);
     void PrintJobs();
     bool WriteOut(std::string path);
     bool ReadIn(std::string path);

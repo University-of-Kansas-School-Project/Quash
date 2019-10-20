@@ -24,40 +24,28 @@ bool Quash::ChangeDir(std::string dir) {
 
 }
 
-bool Quash::Run(std::string programPath,  bool isBackgroundProcess, std::string programArgs[]) {
+bool Quash::Run(std::string* programPath,  bool isBackgroundProcess, int c) {
   pid_t p_id;
+  int status;
   p_id = fork();
-  /*int size = *(&programArgs + 1) - programArgs;
-  char * const args[size+1];
-  for(int i =0; i<size; i++){
-    args[i] = programArgs[i].c_str();
+  char * args[c+1];
+  for(int i =0; i<c; i++){
+    args[i] = const_cast<char *>(programPath[i].c_str());
   }
 
-//sprintf()
- char args[size+1];
-  for(int lcv; lcv < size+1; lcv++) {
-    // args[lcv] = new char[programArgs[lcv].size()];
-    args[lcv] = programArgs
-  }
-  args[size] = NULL;*/
-  //char * c[] = {programArgs[i].c_str(), NULL};
+  args[c] = NULL;
+
   if(p_id < 0){
     fprintf(stderr, "Error in Fork\n");
     return false;
   }
-  //Run program with no arguments
-  if(programArgs == NULL) {
-    // In child process
-    if(p_id == 0){
-      //execv(programPath.c_str(), &args);
-      fprintf(stdout, "In child process without arguments\n");
-    }
+  if(p_id == 0){
+    execvp(args[0], args);
   }
-  //Run program with arguments
-  else {
-    if(p_id == 0)
-      fprintf(stdout, "In child process with arguments\n");
-  }
+  else if(!isBackgroundProcess)
+    while (wait(&status) != p_id);
+
+  return false;
 }
 
 void Quash::PrintJobs() {
