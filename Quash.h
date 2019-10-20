@@ -23,15 +23,18 @@ class Quash {
     std::string* GetPath() { return path; }
     std::string GetHome() { return home; }
     std::string GetPwd() {return pwd; }
+    std::string GetPathRaw() {return pathRaw; }
 
     void SetPath(std::string* pth) { path = pth; }
     void SetHome(std::string h) { home = h; }
     void SetPwd(std::string pd) { pwd = pd; }
+    void SetPathRaw(std::string raw) { pathRaw = raw; }
 
 
   private:
     //Private Member Variables
     std::string* path;
+    std::string pathRaw;
     std::string home;
     std::string pwd;
 
