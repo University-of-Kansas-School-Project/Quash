@@ -52,13 +52,13 @@ void Executive::Run() {
   std::string inp = "";
   char * args;
   while(b){
-    std::cout<<"quash> ";
+    std::cout<<prog->GetPwd() <<"> ";
     //std::getline(std::cin, inp);
     inp = "";
     std::getline(std::cin, inp);
     int countSP=1;
       for(int lcv = 0; lcv < inp.length(); lcv++) {
-        inp[lcv] = std::tolower(inp[lcv]);
+          //inp[lcv] = std::tolower(inp[lcv]);
         if(inp[lcv] == ' ' || inp[lcv] == '\0') {
           countSP++;
         }
@@ -83,10 +83,26 @@ void Executive::Run() {
     //non user defined path
 
     std::cout<<std::endl;
-    //  std::cout << inp <<std::endl;
       if(inp == "quit" || inp == "exit") {
         std::cout <<"Goodbye!\n";
         exit(0);
+      }
+      else if(inpArgs[0] == "cd") {
+        if(countSP == 1) {
+          prog->ChangeDir(NULL);
+        }
+        else if(countSP == 2) {
+          if(inpArgs[1][0] == '~') {
+            inpArgs[1] = std::string(getenv("HOME")) + inpArgs[1].substr(1,inpArgs[1].size());
+            prog->ChangeDir(inpArgs[1].c_str());
+          }
+          else {
+            prog->ChangeDir(inpArgs[1].c_str());
+          }
+        }
+        else {
+          std::cout << "Error: cd has extra arguments\n";
+        }
       }
       else
         prog->Run(inpArgs, isBG, countSP);
