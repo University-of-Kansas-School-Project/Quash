@@ -50,18 +50,24 @@ void Executive::Run() {
   bool b = true;
   std::string inp = "";
   while(b){
+<<<<<<< HEAD
     bool isBG = false;
     bool inPipe = false;
     int cPipe = 0;
     //std::list<int> lPipe;
     int lPipe =0;
     std::cout<<"quash> ";
+||||||| merged common ancestors
+    std::cout<<"quash> ";
+=======
+    std::cout<<prog->GetPwd() <<"> ";
+>>>>>>> c2d329b778b690fbfc9480ebd41f86d1aec6a4e7
     //std::getline(std::cin, inp);
     inp = "";
     std::getline(std::cin, inp);
     int countSP=1;
       for(int lcv = 0; lcv < inp.length(); lcv++) {
-        inp[lcv] = std::tolower(inp[lcv]);
+          //inp[lcv] = std::tolower(inp[lcv]);
         if(inp[lcv] == ' ' || inp[lcv] == '\0') {
           countSP++;
         }
@@ -93,11 +99,11 @@ void Executive::Run() {
     //non user defined path
 
     std::cout<<std::endl;
-    //  std::cout << inp <<std::endl;
       if(inp == "quit" || inp == "exit") {
         std::cout <<"Goodbye!\n";
         exit(0);
       }
+<<<<<<< HEAD
       else if(inPipe && cPipe > 0){
         std::string leftP[lPipe];
         std::string rightP[countSP-lPipe];
@@ -116,6 +122,26 @@ void Executive::Run() {
         prog->Pipe(leftP, rightP);
         inPipe = false;
       }
+||||||| merged common ancestors
+=======
+      else if(inpArgs[0] == "cd") {
+        if(countSP == 1) {
+          prog->ChangeDir(NULL);
+        }
+        else if(countSP == 2) {
+          if(inpArgs[1][0] == '~') {
+            inpArgs[1] = std::string(getenv("HOME")) + inpArgs[1].substr(1,inpArgs[1].size());
+            prog->ChangeDir(inpArgs[1].c_str());
+          }
+          else {
+            prog->ChangeDir(inpArgs[1].c_str());
+          }
+        }
+        else {
+          std::cout << "Error: cd has extra arguments\n";
+        }
+      }
+>>>>>>> c2d329b778b690fbfc9480ebd41f86d1aec6a4e7
       else
         prog->Run(inpArgs, isBG, countSP);
     }
