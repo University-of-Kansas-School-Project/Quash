@@ -65,7 +65,11 @@ bool Quash::Run(std::string* programPath,  bool isBackgroundProcess, int c) {
     return false;
   }
   if(p_id == 0){
-    execvp(args[0], args);
+    const char *p = GetPath()->c_str();
+    char  pathenv[strlen(p) + sizeof("PATH=")];
+    sprintf(pathenv, "PATH=%s", p);
+    char *envp[] = {pathenv, NULL};
+    execvpe(args[0], args, envp);
   }
   else if(!isBackgroundProcess)
     while (wait(&status) != p_id);
@@ -92,6 +96,10 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     fprintf(stderr, "Error in Fork\n");
     return false;
   }
+  const char *pt = GetPath()->c_str();
+  char  pathenv[strlen(pt) + sizeof("PATH=")];
+  sprintf(pathenv, "PATH=%s", pt);
+  char *envp[] = {pathenv, NULL};
   pid_t p_id1, p_id2;
   int status;
   char * argsl[leftProgram->length()+1];
@@ -114,12 +122,12 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
   }
   if(p_id1 == 0){
     std::cout<<" In left\n";
-    dup2(p[1], STDOUT_FILENO);
     close(p[0]);
+    dup2(p[1], STDOUT_FILENO);
     close(p[1]);
     //write(p[1], "main", 4);
     //std::cout<<"main";
-    execvp(argsl[0], argsl);
+    execvpe(argsl[0], argsl, envp);
   }
 
   p_id2 = fork();
@@ -128,11 +136,12 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     return false;
   }
   if(p_id2 == 0){
+    close(p[1]);
     std::cout<<" In right\n";
+    std::cout<<argsR[1]<<std::endl;
     dup2(p[0], STDIN_FILENO);
     close(p[0]);
-    close(p[1]);
-    execvp(argsR[0], argsR);
+    execvpe(argsR[0], argsR, envp);
   }
 
   if ((waitpid(p_id1, &status, 0)) == -1) {
@@ -143,7 +152,7 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     fprintf(stderr, "Process 1 encountered an error. ERROR%d\n", errno);
     return EXIT_FAILURE;
   }
-
+  return true;
 }
 
 //bool Quash::KillJob(int sigNum, int jobID) {
