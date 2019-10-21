@@ -1,0 +1,6 @@
+Build Instructions:
+
+1. Enter the directory.
+2. use make to build
+3. use ./Quash to run
+4. use exit/quit to exit.
