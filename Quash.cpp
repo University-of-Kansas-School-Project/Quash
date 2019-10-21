@@ -130,7 +130,6 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
       fprintf(stderr, "Error in Exec Left\n");
       return false;
     }
-    exit(0);
   }
   close(p[1]);
   p_id2 = fork();
@@ -140,18 +139,12 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
   }
   if(p_id2 == 0){
     close(p[1]);
-    // for(int i =0; i<rightProgram->length(); i++){
-    // std::cout<<argsR[i];
-    // }
-    //std::cout<<" In right\n";
-    //std::cout<<argsR[0]<<argsR[1]<<argsR[2]<<rightProgram->length()<<std::endl;
     dup2(p[0], STDIN_FILENO);
     close(p[0]);
     if(execvpe(argsR[0], argsR, envp) < 0){
       fprintf(stdout, "Error in Exec Right\n");
       return false;
     }
-    exit(0);
   }
   if ((waitpid(p_id1, &status, 0)) == -1) {
     fprintf(stderr, "Process 0 encountered an error. ERROR%d\n", errno);
@@ -160,6 +153,9 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
   if ((waitpid(p_id2, &status, 0)) == -1) {
     fprintf(stderr, "Process 1 encountered an error. ERROR%d\n", errno);
     return EXIT_FAILURE;
+  }
+  for(int i =0; i<leftProgram->length(); i++){
+    argsl[i] = NULL;
   }
   for(int i =0; i<rightProgram->length(); i++){
     argsR[i] = NULL;
