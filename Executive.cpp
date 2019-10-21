@@ -50,10 +50,13 @@ Executive::Executive(char **envp) {
 
 void Executive::Run() {
   bool b = true;
-  bool isBG = false;
   std::string inp = "";
-  char * args;
   while(b){
+    bool isBG = false;
+    bool inPipe = false;
+    int cPipe = 0;
+    //std::list<int> lPipe;
+    int lPipe =0;
     std::cout<<prog->GetPwd() <<"> ";
     //std::getline(std::cin, inp);
     inp = "";
@@ -71,8 +74,15 @@ void Executive::Run() {
     std::string inpArgs[countSP+1];
     int ind = 0;
 
-    for(int i =0; i<countSP; i++)
+    for(int i =0; i<countSP; i++){
       inpA >> inpArgs[i];
+      if(inpArgs[i] == "|"){
+        inPipe = true;
+        cPipe ++;
+        lPipe = i;
+      //  lPipe.push_back(i);
+      }
+    }
 
       if(inp[inp.size()-1] == '&')
         isBG = true;
@@ -84,10 +94,28 @@ void Executive::Run() {
 
     //non user defined path
 
-    std::cout<<std::endl;
+    //std::cout<<std::endl;
       if(inp == "quit" || inp == "exit") {
         std::cout <<"Goodbye!\n";
         exit(0);
+      }
+      else if(inPipe && cPipe > 0){
+        std::string leftP[lPipe];
+        std::string rightP[countSP-lPipe];
+        //std::cout<<lPipe<<std::endl;
+        //std::cout<<countSP - lPipe-1<<std::endl;
+        for(int i =0; i<lPipe; i++){
+          leftP[i] = inpArgs[i];
+          //std::cout<<leftP[i]<<" ";
+        }
+        std::cout<<std::endl;
+        for(int i = 0; i<countSP-lPipe; i++){
+          rightP[i] = inpArgs[i+lPipe+1];
+          //std::cout<<rightP[i]<<" ";
+        }
+        //std::cout<<std::endl;
+        prog->Pipe(leftP, rightP);
+        inPipe = false;
       }
       else if(inpArgs[0] == "cd") {
         if(countSP == 1) {
