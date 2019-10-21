@@ -53,7 +53,6 @@ bool Quash::Run(std::string* programPath,  bool isBackgroundProcess, int c) {
   pid_t p_id;
   int status;
   char * args[c+1];
-
   //Add Job to BgJobs if Background Process
   if(isBackgroundProcess) {
     std::string raw;
@@ -94,7 +93,6 @@ bool Quash::Run(std::string* programPath,  bool isBackgroundProcess, int c) {
       while (wait(&status) != p_id);
 
   }
-
   return true;
 }
 
@@ -167,7 +165,7 @@ else {
 
 bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
   int p[2];
-  std::cout<<" In pipe\n";
+  //std::cout<<" In pipe\n";
   if(pipe(p)<0){
     fprintf(stderr, "Error in Fork\n");
     return false;
@@ -197,14 +195,31 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     return false;
   }
   if(p_id1 == 0){
-    std::cout<<" In left\n";
+    //std::cout<<" In left\n";
+    //std::cout<<argsl[0]<<argsl[1]<<std::endl;
     close(p[0]);
     dup2(p[1], STDOUT_FILENO);
     close(p[1]);
+	//Run(leftProgram, false, leftProgram->length());
     //write(p[1], "main", 4);
     //std::cout<<"main";
     if(execvpe(argsl[0], argsl, envp) < 0){
-      fprintf(stderr, "Error in Exec\n");
+      fprintf(stderr, "Error in Exec Left\n");
+      return false;
+    }
+  }
+  close(p[1]);
+  p_id2 = fork();
+  if(p_id2 < 0){
+    fprintf(stderr, "Error in Fork\n");
+    return false;
+  }
+  if(p_id2 == 0){
+    dup2(p[0], STDIN_FILENO);
+    close(p[0]);
+	//Run(rightProgram, false, rightProgram->length());
+    if(execvpe(argsR[0], argsR, envp) < 0){
+      fprintf(stdout, "Error in Exec Right\n");
       return false;
     }
   }
@@ -212,27 +227,14 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     fprintf(stderr, "Process 0 encountered an error. ERROR%d\n", errno);
     return EXIT_FAILURE;
   }
-  p_id2 = fork();
-  if(p_id2 < 0){
-    fprintf(stderr, "Error in Fork\n");
-    return false;
-  }
-  if(p_id2 == 0){
-    close(p[1]);
-    std::cout<<" In right\n";
-    std::cout<<argsR[1]<<std::endl;
-    dup2(p[0], STDIN_FILENO);
-    close(p[0]);
-    if(execvpe(argsR[0], argsR, envp) < 0){
-      fprintf(stderr, "Error in Exec\n");
-      return false;
-    }
-  }
   if ((waitpid(p_id2, &status, 0)) == -1) {
     fprintf(stderr, "Process 1 encountered an error. ERROR%d\n", errno);
     return EXIT_FAILURE;
   }
-  return true;
+  //return true;
+  //close(p[0]);
+  //close(p[1]);
+  //return true;
 }
 
 void Quash::Import(std::string inputFile) {

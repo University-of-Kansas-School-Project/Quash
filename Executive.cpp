@@ -135,16 +135,16 @@ void Executive::Run() {
         exit(0);
       }
       else if(inPipe && cPipe > 0){
-        std::string leftP[lPipe];
-        std::string rightP[countSP-lPipe];
+        std::string leftP[lPipe] = {};
+        std::string rightP[countSP-lPipe-1] = {};
         //std::cout<<lPipe<<std::endl;
         //std::cout<<countSP - lPipe-1<<std::endl;
         for(int i =0; i<lPipe; i++){
           leftP[i] = inpArgs[i];
           //std::cout<<leftP[i]<<" ";
         }
-        std::cout<<std::endl;
-        for(int i = 0; i<countSP-lPipe; i++){
+        //std::cout<<std::endl;
+        for(int i = 0; i<countSP-lPipe-1; i++){
           rightP[i] = inpArgs[i+lPipe+1];
           //std::cout<<rightP[i]<<" ";
         }
