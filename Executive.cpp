@@ -2,11 +2,14 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <iterator>
+#include <algorithm>
+#include <bits/stdc++.h>
 
 #include "Executive.h"
 #include "Quash.h"
 
-
+//Executive Class Methods
 Executive::Executive(char **envp) {
   std::string unparsedPath = "";
   std::string* path;
@@ -181,6 +184,90 @@ void Executive::Run() {
         }
         else {
           std::cout <<"Error: Can not import. No file was given.\n";
+        }
+      }
+      else if(inpArgs[0] == "jobs") {
+        prog->ListJobs();
+      }
+      else if(inpArgs[0] == "kill") {
+        if(countSP == 2) {
+          size_t found = inpArgs[1].find('%');
+          if (found != std::string::npos)  {
+            std::string jobNum = inpArgs[1].substr(1, inpArgs[1].size());
+            std::cout <<"Killing job number: " <<jobNum <<std::endl;
+            std::list<Process*>::iterator p = (prog->GetBgProccessList())->begin();
+            std::advance(p, std::stoi(jobNum)-1);
+            if((prog->GetBgProccessList())->size() > std::stoi(jobNum)) {
+              prog->KillJob(jobNum);
+            }
+            else {
+              std::cout <<"Error: Job " <<jobNum <<" does not exist.\n";
+            }
+            // p->status = "terminated";
+          }
+          //Kill with PID
+          else {
+            prog->KillJob(inpArgs[1]);
+            //pop
+          }
+        }
+        else {
+          "Error: wrong number of arguments to kill a job\n";
+        }
+      }
+      else if(inpArgs[0][0] == '%') {
+        std::string jId = inpArgs[0].substr(1, inpArgs[0].size());
+        std::cout <<"Running process with jobID: " <<jId <<std::endl;
+        if((prog->GetBgProccessList())->size() > std::stoi(jId)-1 && std::stoi(jId) != 0) {
+          std::list<Process*>::iterator p = (prog->GetBgProccessList())->begin();
+          std::advance(p, std::stoi(jId)-1);
+          Process* currProcess = *p;
+
+          std::string currCmd[currProcess->numOfArgs];
+          std::istringstream iss;
+          iss.str(currProcess->cmdRaw);
+          for (int i =0; i<currProcess->numOfArgs; i++){
+            iss >> currCmd[i];
+          }
+
+          prog->Run(currCmd, false, currProcess->numOfArgs);
+          (prog->GetBgProccessList())->erase(p);
+        }
+        else {
+          std::cout << "Error: No Background job with job id: " <<jId <<std::endl;
+        }
+      }
+      else if(inpArgs[0] == "fg") {
+
+        if((prog->GetBgProccessList())->empty() == false) {
+          Process * newestProcess = (prog->GetBgProccessList())->back();
+          (prog->GetBgProccessList())->pop_back();
+          //std::cout << "Running process: " <<newestProcess.cmdRaw <<std::endl;
+          //std::cout <<"fg) Num of args: " <<newestProcess.numOfArgs <<" Last arg: " <<newestProcess.cmd[newestProcess.numOfArgs-1] <<std::endl;
+          std::string currCmd[newestProcess->numOfArgs];
+          std::istringstream iss;
+          iss.str(newestProcess->cmdRaw);
+          for (int i =0; i<newestProcess->numOfArgs; i++){
+            iss >> currCmd[i];
+          }
+
+          prog->Run(currCmd, false, newestProcess->numOfArgs);
+        }
+        else {
+          std::cout <<"Error: There are no jobs currently in the background.\n";
+        }
+      }
+      else if(inpArgs[0] == "bg") {
+        if((prog->GetBgProccessList())->empty() == false) {
+          Process * newestProcess = (prog->GetBgProccessList())->back();
+          // std::cout << "bg) Running process: " <<newestProcess.cmdRaw <<std::endl;
+
+          std::cout <<'[' <<(prog->GetBgProccessList())->size() <<"]+ ";
+
+          std::cout << newestProcess->cmdRaw <<'&' <<std::endl;
+        }
+        else {
+          std::cout <<"Error: There are no jobs currently in the background.\n";
         }
       }
       else
