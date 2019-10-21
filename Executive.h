@@ -6,6 +6,8 @@
 
 #include "Quash.h"
 
+struct Process;
+
 class Executive {
   public:
     Executive(char **envp);
@@ -13,8 +15,6 @@ class Executive {
 
   private:
     Quash* prog;
-
-
 };
 
 #endif
