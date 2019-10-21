@@ -57,6 +57,15 @@ void Executive::Run() {
   while(b){
     bool isBG = false;
     bool inPipe = false;
+
+    bool isReadIn = false;
+    int readInPos = 0;
+    std::string readCmd;
+
+    bool isWriteOut = false;
+    int writeOutPos = 0;
+    std::string* writeCmd;
+
     int cPipe = 0;
     //std::list<int> lPipe;
     int lPipe =0;
@@ -87,6 +96,26 @@ void Executive::Run() {
         lPipe = i;
       //  lPipe.push_back(i);
       }
+      //Read in
+      else if(inpArgs[i] == "<"){
+        isReadIn = true;
+        readInPos = i;
+        std::string cmd1[i];
+        for(int lcv = 0; lcv < i; lcv++) {
+          cmd1[lcv] = inpArgs[lcv];
+        }
+        readCmd = inpArgs[0];
+      }
+      else if(inpArgs[i] == ">") {
+        isWriteOut = true;
+        writeOutPos = i;
+        std::string cmd2[i];
+        for(int lcv = 0; lcv < i; lcv++) {
+          cmd2[lcv] = inpArgs[lcv];
+        }
+        writeCmd = cmd2;
+      }
+
       //std::cout<<inpArgs[i];
     }
 
@@ -231,6 +260,8 @@ void Executive::Run() {
           }
 
           prog->Run(currCmd, false, currProcess->numOfArgs);
+          std::cout <<'[' <<jId <<"] " <<currProcess->pid <<" finished " <<currProcess->cmdRaw <<std::endl;
+
           (prog->GetBgProccessList())->erase(p);
         }
         else {
@@ -252,6 +283,8 @@ void Executive::Run() {
           }
 
           prog->Run(currCmd, false, newestProcess->numOfArgs);
+          std::cout <<'[' <<(prog->GetBgProccessList())->size() <<"] " <<newestProcess->pid <<" finished " <<newestProcess->cmdRaw <<std::endl;
+
         }
         else {
           std::cout <<"Error: There are no jobs currently in the background.\n";
@@ -269,6 +302,32 @@ void Executive::Run() {
         else {
           std::cout <<"Error: There are no jobs currently in the background.\n";
         }
+      }
+      else if(isWriteOut) {
+        if(countSP == writeOutPos+2) {
+          std::string pathOut = inpArgs[writeOutPos+1];
+          prog->WriteOut(writeCmd, pathOut);
+        }
+        else {
+          std::cout <<"Error: Writing out to a file should only have one argument after the '>'\n";
+        }
+
+        // isWriteOut = false;
+        // writeOutPos = 0;
+        // writeCmd = nullptr;
+      }
+      else if(isReadIn) {
+        if(countSP == readInPos+2) {
+          std::string pathIn = inpArgs[readInPos+1];
+          prog->ReadIn(readCmd, pathIn);
+        }
+        else {
+          std::cout <<"Error: Reading in from a file should only have one argument after the '<'\n";
+        }
+        // isReadIn = false;
+        // readInPos = 0;
+        // readCmd = nullptr;
+
       }
       else
         prog->Run(inpArgs, isBG, countSP);

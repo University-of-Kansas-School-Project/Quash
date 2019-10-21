@@ -30,8 +30,8 @@ class Quash {
     //Member Functions
     bool ChangeDir(const char* dir);
     bool Run(std::string* programPath, bool isBackgroundProcess, int c);
-    bool WriteOut(std::string path);
-    bool ReadIn(std::string path);
+    bool WriteOut(std::string* cmd, std::string path);
+    bool ReadIn(std::string cmd, std::string path);
     bool Pipe(std::string* leftProgram, std::string* rightProgram);
 
     void ListJobs();

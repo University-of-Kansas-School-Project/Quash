@@ -66,7 +66,7 @@ bool Quash::Run(std::string* programPath,  bool isBackgroundProcess, int c) {
 
     bgJobs->push_back(new Process(getpid(), "stopped", programPath, raw, c));
     std::cout << std::endl;
-    std::cout <<'[' <<bgJobs->size() <<"] " <<getpid() <<std::endl;
+    std::cout <<'[' <<bgJobs->size() <<"] " <<getpid() <<" running in background\n";
     return true;
   }
   else {
@@ -95,14 +95,73 @@ bool Quash::Run(std::string* programPath,  bool isBackgroundProcess, int c) {
 
   }
 
-  return false;
+  return true;
 }
 
-bool Quash::WriteOut(std::string path) {
+bool Quash::WriteOut(std::string* cmd, std::string path) {
+// std::cout <<"In Write Out\n";
 
 }
 
-bool Quash::ReadIn(std::string path) {
+bool Quash::ReadIn(std::string cmd, std::string path) {
+// std::cout <<"In Read In.\n";
+// std::cout <<"Running cmd: " <<cmd <<" and with path: " <<path <<".\n";
+
+std::list<std::list<std::string>*> args;
+std::ifstream fs(path);
+
+char c;
+int numOfCmds = 0;
+std::string temp;
+std::list<std::string>* tempList = new std::list<std::string>;
+tempList->push_back(cmd);
+//Import cmds
+if (fs.is_open()) {
+  while(fs.get(c)) {
+    if (c != ' ' && c != '\n') {
+      temp += c;
+    }
+    else if(c == ' ') {
+      // std::cout << "Adding new arg to cmd list\n";
+      tempList->push_back(temp);
+      temp = "";
+    }
+    else if(c == '\n') {
+      // std::cout <<"Import: Size of current cmd: " <<tempList->size() <<std::endl;
+      tempList->push_back(temp);
+      args.push_back(tempList);
+      tempList = new std::list<std::string>;
+      tempList->push_back(cmd);
+
+      numOfCmds++;
+      temp = "";
+    }
+  }
+  fs.close();
+
+  for(int lcv = 0; lcv < numOfCmds; lcv++) {
+    std::list<std::string>* currentCmd = args.front();
+
+    std::string strArr[currentCmd->size()];
+    std::list<std::string>::iterator it;
+    int argCount = 0;
+    for (it = currentCmd->begin(); it != currentCmd->end(); ++it){
+      strArr[argCount] = *it;
+      argCount++;
+    }
+    std::string bg = strArr[currentCmd->size()-1];
+    bool isBackGnd = false;
+    if(bg[bg.size()-1] == '&') {
+      isBackGnd == true;
+    }
+    Run(strArr, isBackGnd, argCount);
+    std::cout <<std::endl;
+    args.pop_front();
+  }
+}
+else {
+  std::cout << "File Path: " <<path <<" is an invalid path.\n";
+}
 
 }
 
