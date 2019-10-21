@@ -53,7 +53,6 @@ bool Quash::Run(std::string* programPath,  bool isBackgroundProcess, int c) {
   pid_t p_id;
   int status;
   char * args[c+1];
-
   //Add Job to BgJobs if Background Process
   if(isBackgroundProcess) {
     std::string raw;
@@ -94,8 +93,7 @@ bool Quash::Run(std::string* programPath,  bool isBackgroundProcess, int c) {
       while (wait(&status) != p_id);
 
   }
-
-  return false;
+  return true;
 }
 
 bool Quash::WriteOut(std::string path) {
@@ -143,6 +141,7 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     close(p[0]);
     dup2(p[1], STDOUT_FILENO);
     close(p[1]);
+	//Run(leftProgram, false, leftProgram->length());
     //write(p[1], "main", 4);
     //std::cout<<"main";
     if(execvpe(argsl[0], argsl, envp) < 0){
@@ -157,9 +156,9 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     return false;
   }
   if(p_id2 == 0){
-    close(p[1]);
     dup2(p[0], STDIN_FILENO);
     close(p[0]);
+	//Run(rightProgram, false, rightProgram->length());
     if(execvpe(argsR[0], argsR, envp) < 0){
       fprintf(stdout, "Error in Exec Right\n");
       return false;
@@ -173,13 +172,7 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     fprintf(stderr, "Process 1 encountered an error. ERROR%d\n", errno);
     return EXIT_FAILURE;
   }
-  for(int i =0; i<leftProgram->length(); i++){
-    argsl[i] = NULL;
-  }
-  for(int i =0; i<rightProgram->length(); i++){
-    argsR[i] = NULL;
-  }
-  return true;
+  //return true;
   //close(p[0]);
   //close(p[1]);
   //return true;
