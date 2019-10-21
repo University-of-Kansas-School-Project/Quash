@@ -64,24 +64,27 @@ void Executive::Run() {
     int countSP=1;
       for(int lcv = 0; lcv < inp.length(); lcv++) {
           //inp[lcv] = std::tolower(inp[lcv]);
+          if(inp.size() > 3)
         if(inp[lcv] == ' ' || inp[lcv] == '\0') {
           countSP++;
         }
       }
-
+      //std::cout<<countSP<<std::endl;
+      //std::cout<<inp.length()<<std::endl;
     std::istringstream inpA;
     inpA.str(inp);
     std::string inpArgs[countSP+1];
     int ind = 0;
 
     for(int i =0; i<countSP; i++){
-      inpA >> inpArgs[i];
+        inpA >> inpArgs[i];
       if(inpArgs[i] == "|"){
         inPipe = true;
         cPipe ++;
         lPipe = i;
       //  lPipe.push_back(i);
       }
+      //std::cout<<inpArgs[i];
     }
 
       if(inp[inp.size()-1] == '&')
