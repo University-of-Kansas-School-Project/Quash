@@ -135,7 +135,7 @@ void Executive::Run() {
           std::cout <<"HOME set to: " <<prog->GetHome() <<std::endl;
         }
         else {
-          std::cout <<"Error: Set path variable was not HOME or PATH. \n";
+          std::cout <<"Error: Set variable was not HOME or PATH. \n";
         }
       }
       else if(inpArgs[0] == "PATH") {
@@ -143,6 +143,14 @@ void Executive::Run() {
       }
       else if(inpArgs[0] == "HOME") {
         std::cout << prog->GetHome() <<std::endl;
+      }
+      else if(inpArgs[0] == "quash" && inpArgs[1] =="<") {
+        if(countSP >= 3) {
+          prog->Import(inpArgs[2]);
+        }
+        else {
+          std::cout <<"Error: Can not import. No file was given.\n";
+        }
       }
       else
         prog->Run(inpArgs, isBG, countSP);

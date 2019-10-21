@@ -1,4 +1,6 @@
 #include <iostream>
+#include <list>
+#include <fstream>
 #include <string>
 #include <cstring>
 #include <cstdlib>
@@ -22,10 +24,6 @@ Quash::Quash(std::string* p, std::string h, std::string pd) {
 }
 
 //Member Functions
-bool Quash::SetPath(std::string path) {
-
-}
-
 bool Quash::ChangeDir(const char* dir) {
   char* currDir;
   char* prevDir = getcwd(NULL, 1024);
@@ -88,6 +86,66 @@ bool Quash::Pipe(std::string leftProgram, std::string rightProgram) {
 
 }
 
+void Quash::Import(std::string inputFile) {
+  // std::cout << "Importing file: " <<inputFile <<std::endl;
+  std::list<std::list<std::string>*> cmds;
+  std::ifstream fs(inputFile);
+
+  char c;
+  int numOfCmds = 0;
+  std::string temp;
+  std::list<std::string>* tempList = new std::list<std::string>;
+
+  //Import cmds
+  if (fs.is_open()) {
+    while(fs.get(c)) {
+      if (c != ' ' && c != '\n') {
+        temp += c;
+      }
+      else if(c == ' ') {
+        // std::cout << "Adding new arg to cmd list\n";
+        tempList->push_back(temp);
+        temp = "";
+      }
+      else if(c == '\n') {
+        // std::cout <<"Import: Size of current cmd: " <<tempList->size() <<std::endl;
+        tempList->push_back(temp);
+        cmds.push_back(tempList);
+        tempList = new std::list<std::string>;
+        numOfCmds++;
+        temp = "";
+      }
+    }
+    fs.close();
+
+    // std::cout <<"Number of Commands to run: " <<cmds.size() <<std::endl;
+
+    for(int lcv = 0; lcv < numOfCmds; lcv++) {
+      std::list<std::string>* currentCmd = cmds.front();
+
+      // std::cout <<"Size of current cmd: " <<currentCmd->size() <<std::endl;
+
+      std::string strArr[currentCmd->size()];
+      std::list<std::string>::iterator it;
+      int argCount = 0;
+      for (it = currentCmd->begin(); it != currentCmd->end(); ++it){
+        strArr[argCount] = *it;
+        argCount++;
+      }
+      std::string bg = strArr[currentCmd->size()-1];
+      bool isBackGnd = false;
+      if(bg[bg.size()-1] == '&') {
+        isBackGnd == true;
+      }
+      Run(strArr, isBackGnd, argCount);
+      std::cout <<std::endl;
+      cmds.pop_front();
+    }
+  }
+  else {
+    std::cout << "File Path: " <<inputFile <<" is an invalid path.\n";
+  }
+}
 //bool Quash::KillJob(int sigNum, int jobID) {
 //
 // }
