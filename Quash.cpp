@@ -22,11 +22,6 @@ Quash::Quash(std::string* p, std::string h, std::string pd) {
   pwd = pd;
 }
 
-//Member Functions
-bool Quash::SetPath(std::string path) {
-
-}
-
 bool Quash::ChangeDir(const char* dir) {
   char* currDir;
   char* prevDir = getcwd(NULL, 1024);
@@ -127,9 +122,15 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     close(p[1]);
     //write(p[1], "main", 4);
     //std::cout<<"main";
-    execvpe(argsl[0], argsl, envp);
+    if(execvpe(argsl[0], argsl, envp) < 0){
+      fprintf(stderr, "Error in Exec\n");
+      return false;
+    }
   }
-
+  if ((waitpid(p_id1, &status, 0)) == -1) {
+    fprintf(stderr, "Process 0 encountered an error. ERROR%d\n", errno);
+    return EXIT_FAILURE;
+  }
   p_id2 = fork();
   if(p_id2 < 0){
     fprintf(stderr, "Error in Fork\n");
@@ -141,12 +142,10 @@ bool Quash::Pipe(std::string* leftProgram, std::string* rightProgram) {
     std::cout<<argsR[1]<<std::endl;
     dup2(p[0], STDIN_FILENO);
     close(p[0]);
-    execvpe(argsR[0], argsR, envp);
-  }
-
-  if ((waitpid(p_id1, &status, 0)) == -1) {
-    fprintf(stderr, "Process 0 encountered an error. ERROR%d\n", errno);
-    return EXIT_FAILURE;
+    if(execvpe(argsR[0], argsR, envp) < 0){
+      fprintf(stderr, "Error in Exec\n");
+      return false;
+    }
   }
   if ((waitpid(p_id2, &status, 0)) == -1) {
     fprintf(stderr, "Process 1 encountered an error. ERROR%d\n", errno);
